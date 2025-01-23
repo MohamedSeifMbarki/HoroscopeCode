@@ -29,7 +29,9 @@
     "helmet": "^8.0.0",
     "horoscope": "^2.0.1",
     "hpp": "^0.2.3",
-    "morgan": "^1.10.0"
+    "morgan": "^1.10.0",
+    "swagger-jsdoc": "^6.2.8",
+    "swagger-ui-express": "^5.0.1"
   },
   "devDependencies": {
     "jest": "^29.7.0",

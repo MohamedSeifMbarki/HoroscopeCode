@@ -1,5 +1,5 @@
 // ========================
-// Importation des modules
+// Importing Modules
 // ========================
 const express = require("express");
 const cors = require("cors");
@@ -8,70 +8,80 @@ const rateLimit = require("express-rate-limit");
 const hpp = require("hpp");
 const helmet = require("helmet");
 const expressSanitizer = require("express-sanitizer");
-const ApiError = require("./utils/apiError"); // Gestion des erreurs personnalisées
-const globalError = require("./middlewares/error"); // Middleware global de gestion des erreurs
-const horoscopeRouter = require("./routes");
-require("dotenv").config(); // Chargement des variables d'environnement
+const ApiError = require("./utils/apiError"); // Custom error handler
+const globalError = require("./middlewares/error"); // Global error middleware
+const horoscopeRouter = require("./routes"); // Route handler
+const swaggerUi = require("swagger-ui-express");
+const swaggerJsdoc = require("swagger-jsdoc");
+const options = require("./utils/swaggerDef"); // Swagger documentation configuration
+require("dotenv").config(); // Load environment variables
 
 // ========================
-// Initialisation de l'application
+// Application Initialization
 // ========================
 const app = express();
 
 // ========================
-// Middlewares globaux
+// Global Middlewares
 // ========================
-app.use(cors()); // Autorise les requêtes cross-origin
-app.use(expressSanitizer()); // Protège contre les injections en nettoyant les données
-app.use(helmet()); // Renforce la sécurité des headers HTTP
-app.use(hpp()); // Protège contre la pollution des paramètres HTTP
-app.use(globalError); // Gestion globale des erreurs
+app.use(cors()); // Allow cross-origin requests
+app.use(express.json()); // Parse incoming JSON payloads
+app.use(expressSanitizer()); // Sanitize user inputs to prevent injection attacks
+app.use(helmet()); // Set security HTTP headers
+app.use(hpp()); // Prevent HTTP parameter pollution
+app.use(globalError); // Attach the global error handler
 
 // ========================
-// Logs et environnement
+// Logging and Environment Setup
 // ========================
 if (process.env.NODE_ENV === "development") {
-  app.use(morgan("dev")); // Log des requêtes en développement
-  console.log(`node:${process.env.NODE_ENV}`);
+  app.use(morgan("dev")); // Log requests in the console for development
+  console.log(`Running in ${process.env.NODE_ENV} mode`);
 }
 
 // ========================
-// Limitation des requêtes
+// Request Rate Limiting
 // ========================
 const limiter = rateLimit({
-  windowMs: 15 * 60 * 1000, // Période de 15 minutes
-  max: 10000, // Nombre maximum de requêtes autorisées par IP
-  message:
-    "Too many accounts created from this IP, please try again after an hour", // Message d'erreur
+  windowMs: 15 * 60 * 1000, // 15-minute time window
+  max: 10000, // Maximum number of requests per IP
+  message: "Too many requests from this IP, please try again after some time.", // Custom error message
 });
-app.use("/api", limiter); // Application de la limitation sur les routes commençant par /api
+app.use("/api", limiter); // Apply rate limiting to all routes under /api
+
+// ========================
+// Swagger Documentation
+// ========================
+const swaggerSpec = swaggerJsdoc(options);
+app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerSpec)); // Serve API documentation
 
 // ========================
 // Routes
 // ========================
-app.use("/api/v0", horoscopeRouter); // Route simple pour tester l'API
+app.use("/api/v0", horoscopeRouter); // Mount the main router for the API
 
-// Gestion des routes non trouvées
+// Handle undefined routes
 app.all("*", (req, res, next) => {
-  next(new ApiError(`can t find this route ${req.originalUrl}`, 404));
+  next(new ApiError(`Cannot find this route: ${req.originalUrl}`, 404)); // Forward to error handler
 });
 
 // ========================
-// Serveur
+// Server Initialization
 // ========================
-const PORT = process.env.PORT || 7004; // Port par défaut
-const server = app.listen(PORT, () =>
-  console.log(`Server is running on port ${PORT}`)
-);
+const PORT = process.env.PORT || 7004; // Use the port from environment variables or default to 7004
+const server = app.listen(PORT, () => {
+  console.log(`Server is running on port ${PORT}`);
+});
 
 // ========================
-// Gestion des erreurs globales
+// Global Error Handling
 // ========================
 process.on("unhandledRejection", (err) => {
-  console.error(`UnhanledRejection Errors : ${err.name} | ${err.message}`);
+  console.error(`Unhandled Rejection: ${err.name} | ${err.message}`);
   server.close(() => {
-    console.error(`Shutting down ...`);
-    process.exit(1); // Arrêt du processus
+    console.error("Shutting down the server...");
+    process.exit(1); // Exit process with failure
   });
 });
+
 module.exports = server;
