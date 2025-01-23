@@ -4,7 +4,7 @@ exports.paramValidator = [
   query("birthdate")
     .notEmpty()
     .withMessage("MISSING_BIRTHDATE")
-    .isDate({ format: "string" })
+    .isDate()
     .withMessage("INVALID_DATE_FORMAT"),
 
   validatorMiddleware,
