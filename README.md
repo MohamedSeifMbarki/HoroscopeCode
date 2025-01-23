@@ -2,15 +2,14 @@
 
 This project is my response to a task assigned by **Adéo**. It is a lightweight and secure horoscope application built with **Node.js** and the **Express** framework. The app provides the zodiac sign corresponding to a given birthdate, leveraging the **horoscope** library.
 
-Additionally, the project follows best practices, including the **Factory Pattern**, to ensure modularity, scalability, and maintainability. A Dockerfile is included for easy containerization, and GitHub Actions are set up to automate the Docker image build process.
+Additionally, the project follows best practices to ensure modularity, scalability, and maintainability. A Dockerfile is included for easy containerization, and GitHub Actions are set up to automate the Docker image build process.
 
 ---
 
 ## Features ✨
 
 - **Query Zodiac Signs**: Input a birthdate (YYYY-MM-DD) to get the corresponding zodiac sign.
-- **Factory Pattern**: Encapsulation of logic using a dedicated factory for creating services.
-- **Security**: Implemented `helmet` for HTTP headers and `rateLimit` for rate limiting.
+- **Security**: Implemented `helmet` for HTTP headers, `rateLimit` for rate limiting, `hpp` for HTTP parameter pollution and `expressSanitizer` to sanitize inputs .
 - **Containerization**: Dockerized for seamless deployment.
 - **Automated CI**: GitHub Actions workflow to build and push the Docker image.
 
@@ -31,7 +30,7 @@ Additionally, the project follows best practices, including the **Factory Patter
 
    ```bash
    git clone https://github.com/MohamedSeifMbarki/HoroscopeCode.git
-   cd horoscope-code
+   cd HoroscopeCode
    ```
 
 2. Install dependencies:
@@ -48,10 +47,10 @@ Here are the available scripts for this project:
 - **Start the Development Server**:
 
   ```bash
-  npm start
+  npm run start:dev
   ```
 
-  Runs the server on `http://localhost:3000`.
+  Runs the server on `http://localhost:7005`.
 
 - **Run Tests**:
 
@@ -60,14 +59,6 @@ Here are the available scripts for this project:
   ```
 
   Executes the test suite to ensure the app works as expected.
-
-- **Lint the Code**:
-  ```bash
-  npm run lint
-  ```
-  Checks the code for potential issues using ESLint (if configured).
-
----
 
 ## API Endpoints 🌐
 
@@ -84,7 +75,8 @@ Here are the available scripts for this project:
 - **Success**:
   ```json
   {
-    "zodiacSign": "Cancer"
+    "sign": "Cancer",
+    "zodiac": "Dog"
   }
   ```
 - **Error**:
@@ -101,16 +93,16 @@ Here are the available scripts for this project:
 ### Build Docker Image
 
 ```bash
-docker build -t horoscope-code .
+docker build -t horoscope .
 ```
 
 ### Run the Container
 
 ```bash
-docker run -p 3000:3000 horoscope-code
+docker run -p 7005:7005 horoscope
 ```
 
-The app will be available at `http://localhost:3000`.
+The app will be available at `http://localhost:7005`.
 
 ---
 
@@ -126,14 +118,14 @@ The project includes a **GitHub Actions** workflow (`.github/workflows/docker-bu
 
 To use this workflow, configure the following repository secrets:
 
-- `DOCKER_USERNAME`: Your Docker Hub username.
-- `DOCKER_PASSWORD`: Your Docker Hub password.
+- `DOCKER_USERNAME`: Docker Hub username.
+- `DOCKER_PASSWORD`: Docker Hub password.
 
 ---
 
 ## Tests 🧬
 
-The application includes comprehensive tests using **Jest**. Tests validate the API responses for various scenarios (valid dates, invalid dates, and missing query parameters).
+The application includes comprehensive tests using **Jest** and **Supertest**. Tests validate the API responses for various scenarios (valid dates, invalid dates, and missing query parameters).
 
 Run the test suite:
 
