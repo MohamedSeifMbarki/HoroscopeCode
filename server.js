@@ -73,3 +73,4 @@ process.on("unhandledRejection", (err) => {
     process.exit(1); // Arrêt du processus
   });
 });
+module.exports = server;
