@@ -10,6 +10,7 @@ const helmet = require("helmet");
 const expressSanitizer = require("express-sanitizer");
 const ApiError = require("./utils/apiError"); // Gestion des erreurs personnalisées
 const globalError = require("./middlewares/error"); // Middleware global de gestion des erreurs
+const horoscopeRouter = require("./routes");
 require("dotenv").config(); // Chargement des variables d'environnement
 
 // ========================
@@ -48,7 +49,7 @@ app.use("/api", limiter); // Application de la limitation sur les routes commen�
 // ========================
 // Routes
 // ========================
-app.use("/api/hello", (req, res) => res.status(200).send("hello")); // Route simple pour tester l'API
+app.use("/api/v0", horoscopeRouter); // Route simple pour tester l'API
 
 // Gestion des routes non trouvées
 app.all("*", (req, res, next) => {
